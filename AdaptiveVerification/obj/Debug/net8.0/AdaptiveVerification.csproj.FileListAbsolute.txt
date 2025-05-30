@@ -36,6 +36,7 @@ C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\
 C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\AdaptiveVerification.csproj.CoreCompileInputs.cache
 C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\AdaptiveVerification.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\AdaptiveVerification.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\AdaptiveVerification.sourcelink.json
 C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\staticwebassets.development.json
 C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\staticwebassets\msbuild.AdaptiveVerification.Microsoft.AspNetCore.StaticWebAssets.props
@@ -50,4 +51,3 @@ C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\
 C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\AdaptiveVerification.pdb
 C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\AdaptiveVerification.genruntimeconfig.cache
 C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\ref\AdaptiveVerification.dll
-C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\AdaptiveVerification.sourcelink.json
