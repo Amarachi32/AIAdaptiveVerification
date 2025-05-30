@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
@@ -14,6 +14,7 @@ namespace AdaptiveVerification.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly Kernel _kernel;
+
         public KCYController(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -22,83 +23,87 @@ namespace AdaptiveVerification.Controllers
 
         private Kernel InitializeKernel()
         {
-            // Get configuration values
             string modelId = _configuration["AzureOpenAI:ModelId"]!;
             string endpoint = _configuration["AzureOpenAI:Endpoint"]!;
             string apiKey = _configuration["AzureOpenAI:ApiKey"]!;
 
-            // Create a kernel builder with Azure OpenAI chat completion
             var builder = Kernel.CreateBuilder();
             builder.AddAzureOpenAIChatCompletion(modelId, endpoint, apiKey);
 
-            // Build and return the kernel
             return builder.Build();
         }
-        [HttpPost("verify")]
 
+        [HttpPost("verify")]
         public async Task<IActionResult> VerifyCustomer([FromBody] CustomerData customerData)
         {
-            // Step 1: Analyze customer data using Azure OpenAI
             var riskProfile = await AnalyzeCustomerData(customerData);
-            // Step 2: Determine verification requirements based on risk profile
             var verificationRequirements = GetVerificationRequirements(riskProfile);
-            // Step 3: Perform verification (this could involve calling another service)
             var verificationResult = await PerformVerification(customerData, verificationRequirements);
-            // Step 4: Store results in Azure Storage
             await StoreVerificationResult(customerData, verificationResult);
             return Ok(verificationResult);
         }
+
+        private async Task<string> PerformSmallWebSearch(string name, string email)
+        {
+            using var httpClient = new HttpClient();
+            string query = Uri.EscapeDataString($"{name} {email}");
+            string url = $"https://s.jina.ai/?q={query}&size=1";
+            var response = await httpClient.GetStringAsync(url);
+            return response;
+        }
+
+        private async Task<string> PerformFullWebSearch(string name, string email)
+        {
+            using var httpClient = new HttpClient();
+            string query = Uri.EscapeDataString($"{name} {email}");
+            string url = $"https://s.jina.ai/?q={query}&size=5";
+            var response = await httpClient.GetStringAsync(url);
+            return response;
+        }
+
         private async Task<string> AnalyzeCustomerData(CustomerData customerData)
         {
             try
             {
-                // Serialize customer data to JSON for analysis
-                var customerDataJson = JsonSerializer.Serialize(customerData, new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
+                var smallSearchResult = await PerformSmallWebSearch(customerData.Name, customerData.Email);
+                var fullSearchResult = await PerformFullWebSearch(customerData.Name, customerData.Email);
 
-                // Create a comprehensive prompt for risk analysis
+                var systemMessage = @"
+You are a risk analyzer expert. Based on these public records and BVN records, propose a risk level.
+For example:
+<user>Has unpaid loans
+Suspected multiple identities</user>
+<assistant>{ ""risk"": ""High"" }</assistant>
+<user>No unpaid loans
+Single identity
+Good financial standing</user>
+<assistant>{ ""risk"": ""Low"" }</assistant>
+Now analyze the following:";
 
-                string prompt = $@"
-                You are a KYC assistant. Based on UTC time and user submission info (name, email), assign a KYC verification method.
-                Risk window mapping:
-                - 00:00–01:00 → low
-                - 02:00–05:00 → medium
-                - 06:00–10:00 → high
+                string userMessage = $@"
+<user>
+Full Name: {customerData.Name}
+Email: {customerData.Email}
+Web Summary (brief): {smallSearchResult}
+Web Details (full): {fullSearchResult}
+</user>";
 
-                For low: PIN verification.
-                For medium: PIN + OTP.
-                For high: Facial Recognition.
-
-                Current UTC time: {DateTime.UtcNow}
-                Name: {customerData.Name}
-                Email: {customerData.Email}
-                """;
-
-                // Call Azure OpenAI using Semantic Kernel
+                var prompt = $"{systemMessage}\n{userMessage}";
                 var result = await _kernel.InvokePromptAsync(prompt);
-
-                // Parse the response to extract risk level
                 var response = result.GetValue<string>();
-                var riskLevel = ExtractRiskLevel(response);
+                Console.WriteLine($"AI Evaluation Response:\n{response}");
 
-                // Log the full response for audit purposes
-                Console.WriteLine($"AI Analysis Response: {response}");
-
-                return riskLevel;
+                return ExtractRiskLevel(response);
             }
             catch (Exception ex)
             {
-                // Log error and return default risk level
                 Console.WriteLine($"Error in AnalyzeCustomerData: {ex.Message}");
-                return "MEDIUM"; // Default to medium risk if analysis fails
+                return "MEDIUM";
             }
         }
 
         private string ExtractRiskLevel(string aiResponse)
         {
-            // Extract risk level from AI response
             var lines = aiResponse.Split('\n');
             foreach (var line in lines)
             {
@@ -109,13 +114,12 @@ namespace AdaptiveVerification.Controllers
                 }
             }
 
-            // If no explicit risk level found, try to infer from response
             var responseUpper = aiResponse.ToUpper();
             if (responseUpper.Contains("CRITICAL")) return "CRITICAL";
             if (responseUpper.Contains("HIGH")) return "HIGH";
             if (responseUpper.Contains("LOW")) return "LOW";
 
-            return "MEDIUM"; // Default fallback
+            return "MEDIUM";
         }
 
         private List<string> GetVerificationRequirements(string riskProfile)
@@ -156,29 +160,16 @@ namespace AdaptiveVerification.Controllers
                 }
             };
         }
+
         private async Task<string> AnalyzeCustomerDatas(CustomerData customerData)
         {
-            // Call Azure OpenAI to analyze data and return risk profile
-            // This is a placeholder for actual implementation
-            return "medium"; // Example risk profile
+            // Placeholder for actual implementation
+            return "medium";
         }
-
-        /*        private string GetVerificationRequirements(string riskProfile)
-                {
-                    // Define verification requirements based on risk profile
-                    return riskProfile switch
-                    {
-                        "low" => "Basic verification",
-                        "medium" => "Standard verification",
-                        "high" => "Enhanced verification",
-                        _ => "Unknown"
-                    };
-                }*/
 
         private async Task<VerificationResult> PerformVerification(CustomerData customerData, List<string> requirements)
         {
-            // Placeholder implementation - replace with actual verification logic
-            await Task.Delay(100); // Simulate async operation
+            await Task.Delay(100); // Simulated async operation
 
             return new VerificationResult
             {
@@ -189,23 +180,21 @@ namespace AdaptiveVerification.Controllers
                 RiskProfile = await AnalyzeCustomerData(customerData)
             };
         }
+
         private async Task<string> PerformVerification(CustomerData customerData, string requirements)
         {
-            // Implement verification logic based on requirements
-            // This is a placeholder for actual implementation
+            // Placeholder
             return "Verification successful";
         }
 
         private async Task StoreVerificationResult(CustomerData customerData, string result)
         {
-            // Store the verification result in Azure Storage
-            // This is a placeholder for actual implementation
+            // Placeholder for actual Azure Storage implementation
         }
 
         private async Task StoreVerificationResult(CustomerData customerData, VerificationResult result)
         {
-            // Placeholder implementation - replace with actual Azure Storage logic
-            await Task.Delay(50); // Simulate async storage operation
+            await Task.Delay(50); // Simulated async operation
             Console.WriteLine($"Stored verification result for customer {customerData.Email}");
         }
     }
@@ -216,6 +205,7 @@ namespace AdaptiveVerification.Controllers
         public string Email { get; set; }
         // Add other relevant fields
     }
+
     public class VerificationResult
     {
         public string CustomerEmail { get; set; } = string.Empty;
