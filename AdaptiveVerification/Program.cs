@@ -20,6 +20,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     });
     //app.UseSwaggerUI();
 }
+app.MapGet("/", () => "Hello, API is running!");
 
 app.UseHttpsRedirection();
 
