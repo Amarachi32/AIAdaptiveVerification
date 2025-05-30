@@ -50,3 +50,4 @@ C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\
 C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\AdaptiveVerification.pdb
 C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\AdaptiveVerification.genruntimeconfig.cache
 C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\ref\AdaptiveVerification.dll
+C:\Users\Amara\source\repos\AdaptiveVerificationGroup3\AdaptiveVerification\obj\Debug\net8.0\AdaptiveVerification.sourcelink.json
