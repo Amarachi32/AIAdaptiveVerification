@@ -1,0 +1,6 @@
+@AdaptiveVerification_HostAddress = http://localhost:5145
+
+GET {{AdaptiveVerification_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

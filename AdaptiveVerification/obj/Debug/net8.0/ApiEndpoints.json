@@ -1,0 +1,18 @@
+[
+  {
+    "ContainingType": "AdaptiveVerification.Controllers.KCYController",
+    "Method": "VerifyCustomer",
+    "RelativePath": "api/KCY/verify",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "customerData",
+        "Type": "AdaptiveVerification.Controllers.CustomerData",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
