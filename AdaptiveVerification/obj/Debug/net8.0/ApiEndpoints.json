@@ -1,7 +1,7 @@
 [
   {
     "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_1",
+    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_2",
     "RelativePath": "",
     "HttpMethod": "GET",
     "IsController": false,
@@ -21,6 +21,22 @@
     "ContainingType": "AdaptiveVerification.Controllers.KCYController",
     "Method": "VerifyCustomer",
     "RelativePath": "api/KCY/verify",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "customerData",
+        "Type": "AdaptiveVerification.Controllers.CustomerData",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "AdaptiveVerification.Controllers.KCYOldController",
+    "Method": "VerifyCustomer",
+    "RelativePath": "api/KCYOld/verify",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
