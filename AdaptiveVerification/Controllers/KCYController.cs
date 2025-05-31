@@ -1,23 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.SemanticKernel;
-
-/*namespace AdaptiveVerification.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    public class KCYController : ControllerBase
-    {
-    }
-}*/
-
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
-using System.Text.Json;
 
 namespace AdaptiveVerification.Controllers
 {
@@ -27,7 +10,8 @@ namespace AdaptiveVerification.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly Kernel _kernel;
-
+        private readonly BlobServiceClient _blobServiceClient;
+        private readonly string _containerName;
         public KCYController(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -56,19 +40,19 @@ namespace AdaptiveVerification.Controllers
             return Ok(verificationResult);
         }
 
-        private async Task<string> PerformSmallWebSearch(string name, string email)
+        private async Task<string> PerformSmallWebSearch(CustomerData customerData)
         {
             using var httpClient = new HttpClient();
-            string query = Uri.EscapeDataString($"{name} {email}");
+            string query = Uri.EscapeDataString($"{customerData.Name} {customerData.Email}");
             string url = $"https://s.jina.ai/?q={query}&size=1";
             var response = await httpClient.GetStringAsync(url);
             return response;
         }
 
-        private async Task<string> PerformFullWebSearch(string name, string email)
+        private async Task<string> PerformFullWebSearch(CustomerData customerData)
         {
             using var httpClient = new HttpClient();
-            string query = Uri.EscapeDataString($"{name} {email}");
+            string query = Uri.EscapeDataString($"{customerData.Name} {customerData.Email}");
             string url = $"https://s.jina.ai/?q={query}&size=5";
             var response = await httpClient.GetStringAsync(url);
             return response;
@@ -78,8 +62,8 @@ namespace AdaptiveVerification.Controllers
         {
             try
             {
-                var smallSearchResult = await PerformSmallWebSearch(customerData.Name, customerData.Email);
-                var fullSearchResult = await PerformFullWebSearch(customerData.Name, customerData.Email);
+                //var smallSearchResult = await PerformSmallWebSearch(customerData);
+                //var fullSearchResult = await PerformFullWebSearch(customerData);
 
                 var systemMessage = @"
                 You are a risk analyzer expert. Based on these public records and BVN records, propose a risk level.
@@ -97,8 +81,10 @@ namespace AdaptiveVerification.Controllers
                 <user>
                 Full Name: {customerData.Name}
                 Email: {customerData.Email}
-                Web Summary (brief): {smallSearchResult}
-                Web Details (full): {fullSearchResult}
+                BVN: {customerData.BVN}
+                Phone: {customerData.Phone}
+                Web Summary (brief):  //smallSearchResult
+                Web Details (full): //fullSearchResult
                 </user>";
 
                 var prompt = $"{systemMessage}\n{userMessage}";
@@ -111,7 +97,7 @@ namespace AdaptiveVerification.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in AnalyzeCustomerData: {ex.Message}");
-                return "MEDIUM";
+                return "No Risk Factor";
             }
         }
 
@@ -132,7 +118,8 @@ namespace AdaptiveVerification.Controllers
             if (responseUpper.Contains("HIGH")) return "HIGH";
             if (responseUpper.Contains("LOW")) return "LOW";
 
-            return "MEDIUM";
+            //return "MEDIUM";
+            return responseUpper;
         }
 
         private List<string> GetVerificationRequirements(string riskProfile)
@@ -174,26 +161,24 @@ namespace AdaptiveVerification.Controllers
             };
         }
 
-        private async Task<string> AnalyzeCustomerDatas(CustomerData customerData)
-        {
-            // Placeholder for actual implementation
-            return "medium";
-        }
-
         private async Task<VerificationResult> PerformVerification(CustomerData customerData, List<string> requirements)
         {
-            await Task.Delay(100); // Simulated async operation
+            await Task.Delay(100); 
 
             return new VerificationResult
             {
                 CustomerEmail = customerData.Email,
-                Status = "Pending",
+                Status = "Verification successful",//"Pending",
                 Requirements = requirements,
                 Timestamp = DateTime.UtcNow,
                 RiskProfile = await AnalyzeCustomerData(customerData)
             };
         }
-
+        private async Task StoreVerificationResult(CustomerData customerData, VerificationResult result)
+        {
+            await Task.Delay(50); // Simulated async operation
+            Console.WriteLine($"Stored verification result for customer {customerData.Email}");
+        }
         private async Task<string> PerformVerification(CustomerData customerData, string requirements)
         {
             // Placeholder
@@ -205,10 +190,10 @@ namespace AdaptiveVerification.Controllers
             // Placeholder for actual Azure Storage implementation
         }
 
-        private async Task StoreVerificationResult(CustomerData customerData, VerificationResult result)
+/*        private async Task StoreVerificationResult(CustomerData customerData, VerificationResult result)
         {
             await Task.Delay(50); // Simulated async operation
             Console.WriteLine($"Stored verification result for customer {customerData.Email}");
-        }
+        }*/
     }
 }

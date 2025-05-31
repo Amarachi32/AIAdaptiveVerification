@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AdaptiveVerification")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+085e7045d0b29063b1f5c51431de3ce5bb78cfee")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+84040fd3bf7771f44aa1275d4cacb4b0587f0b65")]
 [assembly: System.Reflection.AssemblyProductAttribute("AdaptiveVerification")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AdaptiveVerification")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

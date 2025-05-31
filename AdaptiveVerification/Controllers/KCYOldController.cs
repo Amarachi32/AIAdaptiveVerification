@@ -235,7 +235,8 @@ namespace AdaptiveVerification.Controllers
     {
         public string Name { get; set; }
         public string Email { get; set; }
-        // Add other relevant fields
+        public string BVN { get; set; }
+        public string Phone { get; set; }
     }
     public class VerificationResult
     {
